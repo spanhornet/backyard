@@ -10,8 +10,12 @@ import cookieParser from 'cookie-parser';
 // Database
 import { databaseConnection } from '@repo/database';
 
+// Cloudflare R2
+import { initializeR2Service } from './services/r2.service';
+
 // Routes
 import usersRouter from './routes/users.route';
+import filesRouter from './routes/files.route';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -36,6 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use('/api/users', usersRouter);
+app.use('/api/files', filesRouter);
 
 // Health check route
 app.get('/api/health', (req: Request, res: Response) => {
@@ -66,6 +71,25 @@ async function startServer() {
       uri: connectionString,
     });
     console.log('✅ Database connected successfully');
+
+    // Initialize Cloudflare R2 service
+    const r2Config = {
+      accountId: process.env.CLOUDFLARE_ACCOUNT_ID!,
+      accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.CLOUDFLARE_SECRET_ACCESS_KEY!,
+      bucketName: process.env.CLOUDFLARE_BUCKET_NAME!,
+    };
+
+    // Validate required environment variables
+    if (!r2Config.accountId || !r2Config.accessKeyId || !r2Config.secretAccessKey || !r2Config.bucketName) {
+      throw new Error('Missing required Cloudflare R2 environment variables');
+    }
+
+    // Initialize Cloudflare R2 service
+    const r2Service = initializeR2Service(r2Config);
+
+    // Test the connection to make sure it actually works
+    await r2Service.validateConnection();
 
     // Start server
     app.listen(PORT, () => {
