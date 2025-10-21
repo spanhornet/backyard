@@ -1,7 +1,7 @@
 "use client";
 
 // React
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 // Next.js
 import { useSearchParams, useRouter } from "next/navigation";
@@ -28,7 +28,7 @@ interface VerifyMagicLinkResponse {
   };
 }
 
-export default function VerifyMagicLinkPage() {
+function VerifyMagicLinkContent() {
   // Set state
   const [, setIsVerifying] = useState(true);
 
@@ -82,5 +82,17 @@ export default function VerifyMagicLinkPage() {
     <div className="fixed inset-0 flex items-center justify-center">
       <Spinner className="h-8 w-8" />
     </div>
+  );
+}
+
+export default function VerifyMagicLinkPage() {
+  return (
+    <Suspense fallback={
+      <div className="fixed inset-0 flex items-center justify-center">
+        <Spinner className="h-8 w-8" />
+      </div>
+    }>
+      <VerifyMagicLinkContent />
+    </Suspense>
   );
 }
