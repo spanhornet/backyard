@@ -2,8 +2,8 @@
   "name": "express-js-api",
   "version": "1.0.0",
   "description": "",
+  "type": "commonjs",
   "main": "dist/server.js",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
