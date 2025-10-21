@@ -16,6 +16,7 @@ export interface R2Configuration {
   accessKeyId: string;
   secretAccessKey: string;
   bucketName: string;
+  publicUrl: string; // Public R2.dev URL (e.g., https://pub-xxx.r2.dev)
 }
 
 export interface UploadResponse {
@@ -56,10 +57,12 @@ export class R2Service {
   private s3Client: S3Client;
   private bucketName: string;
   private accountId: string;
+  private publicUrl: string;
 
   constructor(config: R2Configuration) {
     this.accountId = config.accountId;
     this.bucketName = config.bucketName;
+    this.publicUrl = config.publicUrl;
     this.s3Client = new S3Client({
       region: 'auto',
       endpoint: `https://${config.accountId}.r2.cloudflarestorage.com`,
@@ -86,7 +89,8 @@ export class R2Service {
   }
 
   private buildUrl(key: string): string {
-    return `https://${this.accountId}.r2.cloudflarestorage.com/${this.bucketName}/${key}`;
+    // Use public R2.dev URL instead of internal storage URL
+    return `${this.publicUrl}/${key}`;
   }
 
   private validateFileType(filename: string): void {

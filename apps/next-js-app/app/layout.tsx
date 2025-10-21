@@ -21,8 +21,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Starfish",
-  description: "ENTERD DESCRIPTION HERE",
+  title: "DSP Alumni Directory",
+  description: "A comprehensive database of Delta Sigma Pi alumni",
 };
 
 export default function RootLayout({

@@ -7,6 +7,9 @@ import cors from 'cors';
 // Cookie Parser
 import cookieParser from 'cookie-parser';
 
+// Morgan
+import morgan from 'morgan';
+
 // Database
 import { databaseConnection } from '@repo/database';
 
@@ -15,7 +18,7 @@ import { initializeR2Service } from './services/r2.service';
 
 // Routes
 import usersRouter from './routes/users.route';
-import filesRouter from './routes/files.route';
+import profilesRouter from './routes/profiles.route';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -34,13 +37,14 @@ const corsOptions = {
 
 // Middleware
 app.use(cors(corsOptions));
+app.use(morgan('dev')); // HTTP request logger
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use('/api/users', usersRouter);
-app.use('/api/files', filesRouter);
+app.use('/api/profiles', profilesRouter);
 
 // Health check route
 app.get('/api/health', (req: Request, res: Response) => {
@@ -54,7 +58,17 @@ app.use('*', (req: Request, res: Response) => {
 
 // Error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  const timestamp = new Date().toISOString();
+
+  // Log detailed error information
+  console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.error(`❌ ERROR [${timestamp}]`);
+  console.error(`📍 Route: ${req.method} ${req.path}`);
+  console.error(`📝 Message: ${err.message}`);
+  console.error(`🔍 Stack Trace:`);
   console.error(err.stack);
+  console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
@@ -78,10 +92,11 @@ async function startServer() {
       accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY_ID!,
       secretAccessKey: process.env.CLOUDFLARE_SECRET_ACCESS_KEY!,
       bucketName: process.env.CLOUDFLARE_BUCKET_NAME!,
+      publicUrl: process.env.CLOUDFLARE_PUBLIC_URL!,
     };
 
     // Validate required environment variables
-    if (!r2Config.accountId || !r2Config.accessKeyId || !r2Config.secretAccessKey || !r2Config.bucketName) {
+    if (!r2Config.accountId || !r2Config.accessKeyId || !r2Config.secretAccessKey || !r2Config.bucketName || !r2Config.publicUrl) {
       throw new Error('Missing required Cloudflare R2 environment variables');
     }
 
