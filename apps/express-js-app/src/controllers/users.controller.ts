@@ -1,3 +1,6 @@
+// Node.js
+import crypto from 'crypto';
+
 // Express
 import { Request, Response } from 'express';
 
