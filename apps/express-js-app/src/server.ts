@@ -49,7 +49,7 @@ app.use('/api/profiles', profilesRouter);
 
 // Health check route
 app.get('/api/health', (req: Request, res: Response) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ status: 'Hello, world!', timestamp: new Date().toISOString() });
 });
 
 // 404 handler
