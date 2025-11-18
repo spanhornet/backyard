@@ -55,6 +55,9 @@ import { ResumeUpload } from "./components/upload.resume";
 // `AvatarUpload` Component
 import { AvatarUpload } from "./components/upload.avatar";
 
+// `CompanySelect` Component
+import { CompanySelect } from "./components/select.company";
+
 // Constants
 import {
   CLASS_OPTIONS,
@@ -97,6 +100,8 @@ const profileFormSchema = z.object({
   })).min(1, "There must be at least 1 education"),
   experiences: z.array(z.object({
     company: z.string().min(1, "Please enter a company name"),
+    companyDomain: z.string().optional(),
+    companyLogo: z.string().optional(),
     location: z.string().min(1, "Please enter a location"),
     position: z.string().min(1, "Please enter a job position"),
     startMonth: z.string().min(1, "Please enter a start month"),
@@ -232,6 +237,8 @@ export default function ProfilePage() {
       if (existingProfile.experiences && existingProfile.experiences.length > 0) {
         form.setValue("experiences", existingProfile.experiences.map(exp => ({
           company: exp.company || "",
+          companyDomain: (exp as any).companyDomain || "",
+          companyLogo: (exp as any).companyLogo || "",
           location: exp.location || "",
           position: exp.position || "",
           startMonth: exp.startMonth || "",
@@ -275,6 +282,8 @@ export default function ProfilePage() {
   const handleAddExperience = () => {
     appendExperience({
       company: "",
+      companyDomain: "",
+      companyLogo: "",
       location: "",
       position: "",
       startMonth: "",
@@ -475,7 +484,7 @@ export default function ProfilePage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>Name<span className="text-red-500 -ml-1">*</span></FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -493,7 +502,7 @@ export default function ProfilePage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Email<span className="text-red-500 -ml-1">*</span></FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -512,7 +521,7 @@ export default function ProfilePage() {
                   name="class"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Class</FormLabel>
+                      <FormLabel>Class<span className="text-red-500 -ml-1">*</span></FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="w-full">
@@ -593,7 +602,7 @@ export default function ProfilePage() {
                       name={`education.${index}.university`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>University</FormLabel>
+                          <FormLabel>University<span className="text-red-500 -ml-1">*</span></FormLabel>
                           <FormControl>
                             <Input
                               type="text"
@@ -611,7 +620,7 @@ export default function ProfilePage() {
                       name={`education.${index}.degreeName`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Field of Study</FormLabel>
+                          <FormLabel>Field of Study<span className="text-red-500 -ml-1">*</span></FormLabel>
                           <FormControl>
                             <Input
                               type="text"
@@ -629,7 +638,7 @@ export default function ProfilePage() {
                       name={`education.${index}.degreeType`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Degree</FormLabel>
+                          <FormLabel>Degree<span className="text-red-500 -ml-1">*</span></FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             value={field.value}
@@ -675,7 +684,7 @@ export default function ProfilePage() {
 
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <FormLabel>Start Date</FormLabel>
+                          <FormLabel>Start Date<span className="text-red-500 -ml-1">*</span></FormLabel>
                           <div className="grid grid-cols-2 gap-2">
                             <FormField
                               control={form.control}
@@ -856,12 +865,30 @@ export default function ProfilePage() {
                         name={`experiences.${index}.company`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Company</FormLabel>
+                            <FormLabel>Company<span className="text-red-500 -ml-1">*</span></FormLabel>
                             <FormControl>
-                              <Input
-                                type="text"
-                                placeholder="Enter a company"
-                                {...field}
+                              <CompanySelect
+                                value={
+                                  field.value
+                                    ? {
+                                      name: field.value,
+                                      domain: form.watch(`experiences.${index}.companyDomain`) || "",
+                                      logo: form.watch(`experiences.${index}.companyLogo`) || "",
+                                    }
+                                    : null
+                                }
+                                onChange={(company) => {
+                                  if (company) {
+                                    field.onChange(company.name);
+                                    form.setValue(`experiences.${index}.companyDomain`, company.domain);
+                                    form.setValue(`experiences.${index}.companyLogo`, company.logo || "");
+                                  } else {
+                                    field.onChange("");
+                                    form.setValue(`experiences.${index}.companyDomain`, "");
+                                    form.setValue(`experiences.${index}.companyLogo`, "");
+                                  }
+                                }}
+                                placeholder="Search for a company..."
                               />
                             </FormControl>
                             <FormMessage />
@@ -874,7 +901,7 @@ export default function ProfilePage() {
                         name={`experiences.${index}.location`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Location</FormLabel>
+                            <FormLabel>Location<span className="text-red-500 -ml-1">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 type="text"
@@ -892,7 +919,7 @@ export default function ProfilePage() {
                         name={`experiences.${index}.position`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Position</FormLabel>
+                            <FormLabel>Position<span className="text-red-500 -ml-1">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 type="text"
@@ -928,7 +955,7 @@ export default function ProfilePage() {
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <FormLabel>Start Date</FormLabel>
+                            <FormLabel>Start Date<span className="text-red-500 -ml-1">*</span></FormLabel>
                             <div className="grid grid-cols-2 gap-2">
                               <FormField
                                 control={form.control}
@@ -1109,7 +1136,7 @@ export default function ProfilePage() {
                           name={`organizations.${index}.name`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Organization</FormLabel>
+                              <FormLabel>Organization<span className="text-red-500 -ml-1">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   type="text"
@@ -1127,7 +1154,7 @@ export default function ProfilePage() {
                           name={`organizations.${index}.position`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Position</FormLabel>
+                              <FormLabel>Position<span className="text-red-500 -ml-1">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   type="text"
@@ -1163,7 +1190,7 @@ export default function ProfilePage() {
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <FormLabel>Start Date</FormLabel>
+                              <FormLabel>Start Date<span className="text-red-500 -ml-1">*</span></FormLabel>
                               <div className="grid grid-cols-2 gap-2">
                                 <FormField
                                   control={form.control}

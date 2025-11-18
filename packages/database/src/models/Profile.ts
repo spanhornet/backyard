@@ -16,6 +16,8 @@ export interface IEducation {
 // Experience subdocument interface
 export interface IExperience {
   company: string;
+  companyDomain?: string;
+  companyLogo?: string;
   location: string;
   position: string;
   startMonth: string;
@@ -107,6 +109,14 @@ const ExperienceSchema = new Schema<IExperience>({
   company: {
     type: String,
     required: true,
+    trim: true,
+  },
+  companyDomain: {
+    type: String,
+    trim: true,
+  },
+  companyLogo: {
+    type: String,
     trim: true,
   },
   location: {

@@ -344,6 +344,19 @@ export class UsersController {
 
       const user = session.userId as any;
 
+      // Check if user exists
+      if (!user) {
+        console.error('User not found for session:', {
+          sessionId: session._id,
+          userId: session.userId,
+          sessionToken: sessionToken
+        });
+        return res.status(404).json({
+          error: 'User not found',
+          message: 'The user associated with this session no longer exists'
+        });
+      }
+
       // Return information
       return res.status(200).json({
         success: true,

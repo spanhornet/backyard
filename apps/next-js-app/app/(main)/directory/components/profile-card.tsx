@@ -131,10 +131,31 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
             <div className="space-y-4">
               {profile.experiences.map((exp: IExperience, index: number) => (
                 <div key={index} className="flex gap-3">
-                  <div className="flex-shrink-0">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Building2Icon className="h-5 w-5 text-primary" />
-                    </div>
+                  <div className="flex-shrink-0 relative">
+                    {exp.companyLogo && exp.companyDomain ? (
+                      <>
+                        <img
+                          src={exp.companyLogo}
+                          alt={`${exp.company} logo`}
+                          className="h-10 w-10 rounded-lg object-contain"
+                          onError={(e) => {
+                            // Hide the image and show fallback icon
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.nextElementSibling;
+                            if (fallback) {
+                              (fallback as HTMLElement).style.display = 'flex';
+                            }
+                          }}
+                        />
+                        <div className="hidden h-10 w-10 rounded-lg bg-primary/10 items-center justify-center">
+                          <Building2Icon className="h-5 w-5 text-primary" />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Building2Icon className="h-5 w-5 text-primary" />
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-foreground text-sm">{exp.position}</h3>

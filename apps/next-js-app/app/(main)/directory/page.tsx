@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import {
   LogOut as LogOutIcon,
   UserPen as UserPenIcon,
+  Search as SearchIcon,
 } from "lucide-react";
 
 // Actions
@@ -21,6 +22,7 @@ import { useProfiles } from "./hooks/use-profiles";
 
 // UI Components
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Empty,
   EmptyHeader,
@@ -47,12 +49,43 @@ export default function DirectoryPage() {
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [hasProfileLoading, setHasProfileLoading] = useState(true);
 
+  // Set search query
+  const [searchQuery, setSearchQuery] = useState("");
+
   // Set profiles
   const {
     data: profilesData,
     isLoading: profilesIsLoading,
     error: profilesError
   } = useProfiles();
+
+  // Filter profiles based on search query
+  const filteredProfiles = profilesData?.profiles.filter((profile) => {
+    if (!searchQuery.trim()) return true;
+
+    const query = searchQuery.toLowerCase();
+
+    // Search by name
+    if (profile.name.toLowerCase().includes(query)) {
+      return true;
+    }
+
+    // Search by university
+    if (profile.education?.some((edu) =>
+      edu.university.toLowerCase().includes(query)
+    )) {
+      return true;
+    }
+
+    // Search by company
+    if (profile.experiences?.some((exp) =>
+      exp.company.toLowerCase().includes(query)
+    )) {
+      return true;
+    }
+
+    return false;
+  }) || [];
 
   // Handle redirects
   useEffect(() => {
@@ -120,6 +153,17 @@ export default function DirectoryPage() {
         </div>
       </nav>
 
+      <div className="relative">
+        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder="Search by name, university, or company..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
       <div>
         {profilesError && (
           <Empty>
@@ -132,21 +176,23 @@ export default function DirectoryPage() {
           </Empty>
         )}
 
-        {profilesData && profilesData.profiles.length === 0 && (
+        {!profilesError && filteredProfiles.length === 0 && (
           <Empty>
             <EmptyHeader>
               <EmptyTitle>No profiles found</EmptyTitle>
               <EmptyDescription>
-                There are no profiles to display at the moment.
+                {searchQuery.trim()
+                  ? "No profiles match your search criteria. Try a different search term."
+                  : "There are no profiles to display at the moment."}
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
         )}
 
-        {profilesData && profilesData.profiles.length > 0 && (
+        {filteredProfiles.length > 0 && (
           <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-            {profilesData.profiles.map((profile) => (
-              <div key={String(profile._id)} className="break-inside-avoid mb-6 isolate">
+            {filteredProfiles.map((profile, index) => (
+              <div key={index} className="break-inside-avoid mb-6 isolate">
                 <ProfileCard profile={profile} />
               </div>
             ))}

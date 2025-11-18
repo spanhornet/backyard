@@ -1,3 +1,6 @@
+// Environment Variables
+import 'dotenv/config';
+
 // Express
 import express, { Request, Response, NextFunction } from 'express';
 
@@ -16,9 +19,13 @@ import { databaseConnection } from '@repo/database';
 // Cloudflare R2
 import { initializeR2Service } from './services/r2.service';
 
+// Logo.dev
+import { initializeLogoDevService } from './services/logodev.service';
+
 // Routes
 import usersRouter from './routes/users.route';
 import profilesRouter from './routes/profiles.route';
+import companiesRouter from './routes/companies.route';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -46,6 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 // API Routes
 app.use('/api/users', usersRouter);
 app.use('/api/profiles', profilesRouter);
+app.use('/api/companies', companiesRouter);
 
 // Health check route
 app.get('/api/health', (req: Request, res: Response) => {
@@ -106,6 +114,17 @@ async function startServer() {
 
     // Test the connection to make sure it actually works
     await r2Service.validateConnection();
+
+    // Initialize Logo.dev service
+    const logoDevSecretKey = process.env.LOGODEV_SECRET_KEY || '';
+    const logoDevPublishableKey = process.env.LOGODEV_PUBLISHABLE_KEY || '';
+
+    if (!logoDevSecretKey || !logoDevPublishableKey) {
+      console.warn('⚠️  LOGODEV_SECRET_KEY or LOGODEV_PUBLISHABLE_KEY is not set - company search features may be limited');
+    }
+
+    initializeLogoDevService(logoDevSecretKey, logoDevPublishableKey);
+    console.log('✅ Logo.dev service initialized');
 
     // Start server
     app.listen(PORT, () => {

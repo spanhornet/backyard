@@ -70,7 +70,7 @@ export function SignInForm() {
       } else {
         setAlertState({
           type: 'success',
-          message: (response.data as any)?.message || 'Sign in successful!'
+          message: `We sent a sign-in link to ${data.email}. Check your inbox and click the link to continue.`
         })
       }
     } finally {
