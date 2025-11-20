@@ -3,6 +3,9 @@
 // React
 import { useState } from "react"
 
+// Next.js
+import Link from "next/link"
+
 // Zod
 import { z } from "zod"
 
@@ -138,6 +141,12 @@ export function SignInForm() {
             'Sign In'
           )}
         </Button>
+        <div className="text-center text-sm text-muted-foreground">
+          Don't have an account?{' '}
+          <Link href="/sign-up" className="font-medium text-primary hover:underline">
+            Sign up
+          </Link>
+        </div>
       </form>
     </Form>
   )

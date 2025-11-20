@@ -1,5 +1,6 @@
 // React
 import React from 'react';
+import Image from 'next/image';
 
 // UI Components
 import {
@@ -19,7 +20,8 @@ import {
   GraduationCap as GraduationCapIcon,
   Briefcase as BriefcaseIcon,
   Users as UsersIcon,
-  User as UserIcon
+  User as UserIcon,
+  School as SchoolIcon
 } from 'lucide-react';
 
 // Types
@@ -33,7 +35,6 @@ import {
 // Actions
 import {
   getInitials,
-  getUniversityInitial,
   formatDateRange
 } from '../actions';
 
@@ -82,11 +83,19 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
               {profile.education.map((edu: IEducation, index: number) => (
                 <div key={index} className="flex gap-3">
                   <div className="flex-shrink-0">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="text-xs font-medium text-primary">
-                        {getUniversityInitial(edu.university)}
-                      </span>
-                    </div>
+                    {edu.university.includes("University of Maryland") ? (
+                      <Image
+                        src="/placeholder.jpeg"
+                        alt="University of Maryland logo"
+                        width={40}
+                        height={40}
+                        className="rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <SchoolIcon className="h-5 w-5 text-primary" />
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-foreground text-sm">

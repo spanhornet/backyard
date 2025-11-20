@@ -22,18 +22,6 @@ export const getInitials = (name: string) => {
     .slice(0, 2);
 };
 
-export const getUniversityInitial = (university: string) => {
-  const words = university.split(' ');
-  if (words.length === 1) {
-    return university.slice(0, 2).toUpperCase();
-  }
-  return words
-    .map(w => w[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-};
-
 export const formatDateRange = (
   startMonth?: string,
   startYear?: string,
