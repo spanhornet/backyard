@@ -46,7 +46,6 @@ export default function DirectoryPage() {
   } = useUser();
 
   // Set flags
-  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [hasProfileLoading, setHasProfileLoading] = useState(true);
 
   // Set search query
@@ -100,7 +99,6 @@ export default function DirectoryPage() {
         // Check if user has a profile
         try {
           const profile = await getUserProfile();
-          setHasProfile(!!profile);
 
           if (!profile) {
             router.push('/profile');
@@ -202,4 +200,3 @@ export default function DirectoryPage() {
     </div>
   );
 }
-
