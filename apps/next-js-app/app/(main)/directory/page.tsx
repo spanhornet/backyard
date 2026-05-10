@@ -30,6 +30,14 @@ import {
   EmptyDescription
 } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  Toast,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
+} from "@/components/ui/toast";
 
 // `ProfileCard` Component
 import ProfileCard from "./components/profile-card";
@@ -51,6 +59,7 @@ export default function DirectoryPage() {
 
   // Set search query
   const [searchQuery, setSearchQuery] = useState("");
+  const [signOutToastOpen, setSignOutToastOpen] = useState(false);
 
   // Set profiles
   const {
@@ -125,7 +134,7 @@ export default function DirectoryPage() {
       router.push('/sign-in');
     } else {
       console.error('Sign out failed:', result.error);
-      // Optionally, you could show a toast notification here
+      setSignOutToastOpen(true);
     }
   };
 
@@ -138,68 +147,84 @@ export default function DirectoryPage() {
   }
 
   return (
-    <div className="w-full space-y-8">
-      <nav className="flex items-center justify-between">
-        <h1 className="text-xl font-medium">DSP Alumni Directory</h1>
-        <div className="flex items-center gap-3">
-          <Button onClick={() => router.push('/profile')}>
-            <UserPenIcon className="w-4 h-4" />
-            Edit profile
-          </Button>
-          <Button onClick={handleSignOut} variant="outline">
-            <LogOutIcon className="w-4 h-4" />
-            Sign out
-          </Button>
-        </div>
-      </nav>
-
-      <div className="relative">
-        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Search by name, university, or company..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      <div>
-        {profilesError && (
-          <Empty>
-            <EmptyHeader>
-              <EmptyTitle>Error loading profiles</EmptyTitle>
-              <EmptyDescription>
-                {profilesError.message || "Failed to load profiles. Please try again."}
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        )}
-
-        {!profilesError && filteredProfiles.length === 0 && (
-          <Empty>
-            <EmptyHeader>
-              <EmptyTitle>No profiles found</EmptyTitle>
-              <EmptyDescription>
-                {searchQuery.trim()
-                  ? "No profiles match your search criteria. Try a different search term."
-                  : "There are no profiles to display at the moment."}
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        )}
-
-        {filteredProfiles.length > 0 && (
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-            {filteredProfiles.map((profile, index) => (
-              <div key={index} className="break-inside-avoid mb-6 isolate">
-                <ProfileCard profile={profile} />
-              </div>
-            ))}
+    <ToastProvider>
+      <div className="w-full space-y-8">
+        <nav className="flex items-center justify-between">
+          <h1 className="text-xl font-medium">DSP Alumni Directory</h1>
+          <div className="flex items-center gap-3">
+            <Button onClick={() => router.push('/profile')}>
+              <UserPenIcon className="w-4 h-4" />
+              Edit profile
+            </Button>
+            <Button onClick={handleSignOut} variant="outline">
+              <LogOutIcon className="w-4 h-4" />
+              Sign out
+            </Button>
           </div>
-        )}
+        </nav>
+
+        <div className="relative">
+          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search by name, university, or company..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        <div>
+          {profilesError && (
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>Error loading profiles</EmptyTitle>
+                <EmptyDescription>
+                  {profilesError.message || "Failed to load profiles. Please try again."}
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          )}
+
+          {!profilesError && filteredProfiles.length === 0 && (
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>No profiles found</EmptyTitle>
+                <EmptyDescription>
+                  {searchQuery.trim()
+                    ? "No profiles match your search criteria. Try a different search term."
+                    : "There are no profiles to display at the moment."}
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          )}
+
+          {filteredProfiles.length > 0 && (
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+              {filteredProfiles.map((profile, index) => (
+                <div key={index} className="break-inside-avoid mb-6 isolate">
+                  <ProfileCard profile={profile} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      <Toast
+        open={signOutToastOpen}
+        onOpenChange={setSignOutToastOpen}
+        variant="destructive"
+      >
+        <div className="grid gap-1">
+          <ToastTitle>Sign out failed</ToastTitle>
+          <ToastDescription>
+            Please try again in a moment.
+          </ToastDescription>
+        </div>
+        <ToastClose />
+      </Toast>
+      <ToastViewport />
+    </ToastProvider>
   );
 }
-
