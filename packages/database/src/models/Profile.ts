@@ -104,6 +104,16 @@ const EducationSchema = new Schema<IEducation>({
   },
 }, { _id: false });
 
+EducationSchema.path('endYear').validate(function (this: any, value: string | undefined | null) {
+  if (value === undefined || value === null || value === '') return true; // allow ongoing entries
+  const start = this.startYear;
+  if (start === undefined || start === null || start === '') return true;
+  const startNum = Number(start);
+  const endNum = Number(value);
+  if (Number.isNaN(startNum) || Number.isNaN(endNum)) return true;
+  return endNum >= startNum;
+}, 'endYear must be greater than or equal to startYear');
+
 // Experience subdocument schema
 const ExperienceSchema = new Schema<IExperience>({
   company: {
@@ -155,6 +165,16 @@ const ExperienceSchema = new Schema<IExperience>({
   },
 }, { _id: false });
 
+ExperienceSchema.path('endYear').validate(function (this: any, value: string | undefined | null) {
+  if (value === undefined || value === null || value === '') return true;
+  const start = this.startYear;
+  if (start === undefined || start === null || start === '') return true;
+  const startNum = Number(start);
+  const endNum = Number(value);
+  if (Number.isNaN(startNum) || Number.isNaN(endNum)) return true;
+  return endNum >= startNum;
+}, 'endYear must be greater than or equal to startYear');
+
 // Organization subdocument schema
 const OrganizationSchema = new Schema<IOrganization>({
   name: {
@@ -192,6 +212,16 @@ const OrganizationSchema = new Schema<IOrganization>({
     trim: true,
   },
 }, { _id: false });
+
+OrganizationSchema.path('endYear').validate(function (this: any, value: string | undefined | null) {
+  if (value === undefined || value === null || value === '') return true;
+  const start = this.startYear;
+  if (start === undefined || start === null || start === '') return true;
+  const startNum = Number(start);
+  const endNum = Number(value);
+  if (Number.isNaN(startNum) || Number.isNaN(endNum)) return true;
+  return endNum >= startNum;
+}, 'endYear must be greater than or equal to startYear');
 
 // Main Profile schema
 const ProfileSchema = new Schema<IProfile>(
